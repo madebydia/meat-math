@@ -1,0 +1,1311 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meat Math | @madebydia</title>
+  <meta name="description" content="A protein-first meat calculator for tired mom meal prep. Pick a protein target and see raw and cooked portions for beef, poultry, pork, lamb, and fish.">
+  <meta name="author" content="@madebydia">
+  <link rel="canonical" href="https://meatmath.thecarnivoremama.com/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%A9%3C/text%3E%3C/svg%3E">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://meatmath.thecarnivoremama.com/">
+  <meta property="og:title" content="Meat Math | @madebydia">
+  <meta property="og:description" content="Pick a protein target and see raw and cooked meat portions without opening a macro app.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Meat Math | @madebydia">
+  <meta name="twitter:description" content="Pick a protein target and see raw and cooked meat portions without opening a macro app.">
+  <meta name="theme-color" content="#f4e6d4">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;700&family=Josefin+Sans:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      color-scheme: light;
+      --cream: #f4e6d4;
+      --cream-light: #fffaf0;
+      --paper: #fffaf0;
+      --field: #fffaf0;
+      --cream-ink: #fffaf0;
+      --tinted-ink: #1c1a1a;
+      --salmon: #d68b8b;
+      --salmon-strong: #eaa7a0;
+      --salmon-faint: rgba(214, 139, 139, 0.16);
+      --steak-red: #782a2f;
+      --black: #1c1a1a;
+      --mint: #a5c4b8;
+      --mint-deep: #8ca897;
+      --mint-faint: rgba(165, 196, 184, 0.42);
+      --olive: #a69165;
+      --brass: #c89f53;
+      --gray: #6d625b;
+
+      --font-display: "Playfair Display", Georgia, serif;
+      --font-deco: "Josefin Sans", system-ui, sans-serif;
+      --font-ui: "DM Sans", system-ui, sans-serif;
+      --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
+
+      --border-heavy: 2px solid var(--black);
+      --border-light: 1px solid var(--black);
+      --border-deco: 1px solid var(--olive);
+      --shadow-hard: 8px 8px 0 var(--black);
+      --shadow-salmon: 8px 8px 0 var(--salmon);
+      --mobile-gutter: 0.65rem;
+      --mobile-shadow: 6px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+        --cream: #11100f;
+        --cream-light: #171312;
+        --paper: #1f1917;
+        --field: #261f1d;
+        --cream-ink: #fffaf0;
+        --tinted-ink: #1c1a1a;
+        --salmon: #d8898e;
+        --salmon-strong: #8f4a51;
+        --salmon-faint: rgba(216, 137, 142, 0.18);
+        --steak-red: #f0a0a5;
+        --black: #f4e6d4;
+        --mint: #9abfb0;
+        --mint-deep: #4f7668;
+        --mint-faint: rgba(154, 191, 176, 0.18);
+        --olive: #c5ad81;
+        --brass: #e0bb6a;
+        --gray: #c7b9ad;
+
+        --border-heavy: 2px solid var(--black);
+        --border-light: 1px solid var(--black);
+        --border-deco: 1px solid var(--olive);
+        --shadow-hard: 8px 8px 0 #050505;
+        --shadow-salmon: 8px 8px 0 #5d2b31;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      min-width: 320px;
+      background: var(--cream);
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      background-color: var(--cream);
+      color: var(--black);
+      font-family: var(--font-deco);
+      -webkit-font-smoothing: antialiased;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .bg-block {
+      position: fixed;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .block-mint-sunburst {
+      top: 0;
+      right: 0;
+      width: 50vw;
+      height: 60vh;
+      background-color: var(--mint-deep);
+      border-bottom-left-radius: 50vw;
+      overflow: hidden;
+    }
+
+    .sunburst-svg {
+      position: absolute;
+      bottom: -10%;
+      left: 50%;
+      width: 150%;
+      height: auto;
+      transform: translateX(-50%);
+      stroke: var(--cream);
+      stroke-width: 1;
+      opacity: 0.4;
+    }
+
+    .block-salmon-arches {
+      bottom: 0;
+      left: -10vw;
+      width: 60vw;
+      height: 50vh;
+      background-color: var(--salmon-strong);
+      transform: rotate(-15deg);
+      transform-origin: bottom left;
+      overflow: hidden;
+      border-top-right-radius: 40px;
+    }
+
+    .arch-pattern {
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 0 100 A 50 50 0 0 1 100 100 M 50 100 A 50 50 0 0 1 150 100 M -50 100 A 50 50 0 0 1 50 100 M 0 50 A 50 50 0 0 1 100 50 M 50 50 A 50 50 0 0 1 150 50 M -50 50 A 50 50 0 0 1 50 50 M 0 0 A 50 50 0 0 1 100 0 M 50 0 A 50 50 0 0 1 150 0 M -50 0 A 50 50 0 0 1 50 0' fill='none' stroke='%23F4F1EA' stroke-width='2' opacity='0.3'/%3E%3C/svg%3E");
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(300px, 0.95fr) minmax(420px, 1.2fr);
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .site-header {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .logo-lockup {
+      border: var(--border-deco);
+      padding: 4px;
+      position: relative;
+      background: var(--cream);
+    }
+
+    .logo-inner {
+      border: var(--border-deco);
+      padding: 1.5rem 3rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .logo-inner::before,
+    .logo-inner::after,
+    .logo-lockup::before,
+    .logo-lockup::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--cream);
+      border: var(--border-deco);
+      transform: rotate(45deg);
+    }
+
+    .logo-inner::before { top: -4px; left: -4px; }
+    .logo-inner::after { bottom: -4px; right: -4px; }
+    .logo-lockup::before { top: -4px; right: -4px; }
+    .logo-lockup::after { bottom: -4px; left: -4px; }
+
+    .logo-title {
+      font-family: var(--font-deco);
+      font-size: 3rem;
+      font-weight: 300;
+      letter-spacing: 0;
+      line-height: 1;
+    }
+
+    .logo-subtitle {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      margin-top: 1rem;
+      color: var(--olive);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .logo-subtitle::before,
+    .logo-subtitle::after {
+      content: "";
+      height: 1px;
+      width: 30px;
+      background: var(--olive);
+    }
+
+    .control-panel {
+      background: var(--cream);
+      border: var(--border-heavy);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-hard);
+    }
+
+    .select-wrap {
+      position: relative;
+    }
+
+    .select-wrap::after {
+      content: "";
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid var(--steak-red);
+      transform: translateY(-35%);
+      pointer-events: none;
+    }
+
+    .panel-header,
+    .section-header {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      border-bottom: var(--border-heavy);
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1rem;
+    }
+
+    .section-header {
+      margin-bottom: 1rem;
+      padding-bottom: 0.35rem;
+    }
+
+    .section-header span {
+      color: var(--salmon);
+      font-size: 0.68rem;
+    }
+
+    .input-group {
+      margin-bottom: 2rem;
+    }
+
+    .input-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label,
+    .input-label {
+      display: block;
+      font-family: var(--font-deco);
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .sub-label,
+    .input-label-sub {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: #666;
+      margin-bottom: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    input[type="number"],
+    input[type="search"],
+    select {
+      width: 100%;
+      min-height: 52px;
+      background: var(--field);
+      border: var(--border-heavy);
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+      color: var(--black);
+      outline: none;
+      border-radius: 0;
+      appearance: none;
+    }
+
+    select {
+      padding-right: 2.75rem;
+      cursor: pointer;
+    }
+
+    input[type="number"] {
+      font-size: 1.5rem;
+    }
+
+    input:focus,
+    select:focus {
+      background: var(--salmon);
+      color: var(--cream);
+    }
+
+    .error {
+      display: none;
+      margin-top: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--steak-red);
+    }
+
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: var(--border-heavy);
+    }
+
+    .toggle-label {
+      text-align: center;
+      padding: 1rem 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-right: var(--border-heavy);
+      background: transparent;
+      color: var(--black);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .toggle-label:nth-child(3n),
+    .toggle-label:last-child {
+      border-right: 0;
+    }
+
+    .toggle-label.active {
+      background: var(--black);
+      color: var(--cream);
+    }
+
+    .toggle-label.accent.active {
+      background: var(--steak-red);
+    }
+
+    .unit-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .readout-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .badge-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .logo-lockup .badge-container {
+      position: absolute;
+      right: -78px;
+      top: -36px;
+      margin: 0;
+      z-index: 2;
+    }
+
+    .deco-badge {
+      width: 118px;
+      height: 118px;
+      border: var(--border-deco);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: var(--cream);
+    }
+
+    .deco-badge::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border: 1px dashed var(--olive);
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+
+    .badge-icon {
+      width: 42px;
+      height: 42px;
+      fill: none;
+      stroke: var(--steak-red);
+      stroke-width: 2;
+      stroke-linecap: square;
+    }
+
+    .badge-text {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .output-card,
+    .manifest-card {
+      background: var(--cream);
+      border: var(--border-deco);
+      padding: 4px;
+      position: relative;
+    }
+
+    .output-card.highlight {
+      background: var(--mint-deep);
+      border-color: var(--black);
+    }
+
+    .output-card-inner {
+      border: var(--border-deco);
+      padding: 1.65rem;
+      text-align: center;
+    }
+
+    .output-card.highlight .output-card-inner {
+      border-color: var(--black);
+    }
+
+    .output-label {
+      font-family: var(--font-deco);
+      font-size: 0.9rem;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      color: var(--olive);
+    }
+
+    .output-card.highlight .output-label {
+      color: var(--black);
+    }
+
+    .output-value {
+      font-family: var(--font-mono);
+      font-size: 4rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0;
+      color: var(--black);
+      margin-bottom: 0.5rem;
+    }
+
+    .output-value.alert {
+      color: var(--steak-red);
+    }
+
+    .output-sub {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--black);
+      opacity: 0.72;
+    }
+
+    .input-instruction {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--black);
+      padding: 1rem;
+      border: var(--border-heavy);
+      background: var(--salmon-strong);
+      margin-bottom: 2rem;
+    }
+
+    .manifest-section {
+      background: var(--cream);
+      border: var(--border-heavy);
+      box-shadow: var(--shadow-hard);
+    }
+
+    .manifest-title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: var(--steak-red);
+      text-align: center;
+      padding: 1.4rem 1rem 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      line-height: 1.05;
+    }
+
+    .manifest-card {
+      margin: 0 1.5rem 1.5rem;
+      background: var(--paper);
+      border: var(--border-heavy);
+      padding: 1rem;
+    }
+
+    .manifest-card::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: -2px;
+      right: -2px;
+      height: 6px;
+      background-image: linear-gradient(135deg, var(--black) 25%, transparent 25%), linear-gradient(225deg, var(--black) 25%, transparent 25%);
+      background-size: 12px 12px;
+      background-position: 0 0;
+    }
+
+    .manifest-total {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--black);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .manifest-total span {
+      color: var(--steak-red);
+      font-size: 2rem;
+      display: block;
+      margin-top: 0.25rem;
+    }
+
+    .manifest-row {
+      display: grid;
+      grid-template-columns: minmax(0, auto) 1fr auto;
+      align-items: end;
+      gap: 0.45rem;
+      margin-bottom: 0.9rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+
+    .manifest-item,
+    .manifest-weight {
+      background: var(--paper);
+      font-weight: 700;
+    }
+
+    .manifest-leader {
+      border-bottom: 1px dotted var(--black);
+      position: relative;
+      top: -0.25em;
+      min-width: 1rem;
+    }
+
+    .manifest-weight {
+      color: var(--salmon);
+      white-space: nowrap;
+    }
+
+    .manifest-detail {
+      grid-column: 1 / -1;
+      margin: -0.45rem 0 0.25rem;
+      color: var(--gray);
+      font-size: 0.68rem;
+      line-height: 1.45;
+    }
+
+    .copy-btn {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1rem;
+      background: var(--steak-red);
+      color: var(--cream);
+      border: var(--border-heavy);
+      font-family: var(--font-mono);
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .copy-btn::after {
+      content: "->";
+      position: absolute;
+      right: 1rem;
+    }
+
+    .copy-btn:active {
+      background: var(--black);
+      color: var(--brass);
+    }
+
+    details {
+      margin-top: 1rem;
+      border-top: var(--border-heavy);
+      padding-top: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      line-height: 1.45;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    details a {
+      color: inherit;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.18em;
+    }
+
+    .info-footer,
+    .site-footer {
+      grid-column: 1 / -1;
+      text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--olive);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--olive);
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .info-footer a,
+    .site-footer a {
+      color: inherit;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.18em;
+    }
+
+    .site-footer {
+      display: none;
+    }
+
+    .mobile-only {
+      display: none;
+    }
+
+    @media (max-width: 899px) {
+      body {
+        background-color: var(--cream);
+        background-image:
+          linear-gradient(var(--mint-faint) 1px, transparent 1px),
+          linear-gradient(90deg, var(--mint-faint) 1px, transparent 1px);
+        background-size: 24px 24px;
+        display: block;
+        padding: var(--mobile-gutter) var(--mobile-gutter) 0;
+      }
+
+      .bg-block,
+      .badge-container,
+      .output-card,
+      .info-footer,
+      .desktop-only {
+        display: none;
+      }
+
+      .mobile-only {
+        display: block;
+      }
+
+      .container {
+        width: calc(100vw - (var(--mobile-gutter) * 2) - var(--mobile-shadow));
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        background: var(--cream);
+        border: var(--border-heavy);
+        box-shadow: var(--mobile-shadow) 0 0 var(--salmon);
+        overflow: hidden;
+      }
+
+      .container::before {
+        display: none;
+      }
+
+      .site-header {
+        display: block;
+        width: calc(100% + 4px);
+        margin: 0 -2px;
+        text-align: center;
+        padding: 2.5rem 0.75rem 1.5rem;
+        background-color: var(--salmon);
+        border-bottom: var(--border-heavy);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .site-header::after {
+        content: "";
+        position: absolute;
+        inset: -50%;
+        background: radial-gradient(circle, var(--salmon-faint) 0%, transparent 60%);
+        pointer-events: none;
+      }
+
+      .logo-lockup {
+        border: 0;
+        padding: 0;
+        background: transparent;
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .logo-inner {
+        border: 0;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .logo-inner::before,
+      .logo-inner::after,
+      .logo-lockup::before,
+      .logo-lockup::after {
+        display: none;
+      }
+
+      .mobile-meta {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0;
+        color: var(--steak-red);
+        margin-bottom: 1rem;
+      }
+
+      .title-small {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        font-style: italic;
+        font-weight: 700;
+        color: var(--cream-ink);
+        line-height: 0.8;
+        margin-left: -2rem;
+        text-shadow: 2px 2px 0 var(--steak-red);
+      }
+
+      .logo-title {
+        font-family: var(--font-display);
+        font-size: 3.35rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: var(--cream-ink);
+        line-height: 0.85;
+        letter-spacing: 0;
+        margin: 0;
+        max-width: 100%;
+        white-space: nowrap;
+        transform: scaleX(0.94);
+        transform-origin: center;
+        text-shadow:
+          -1px -1px 0 var(--steak-red),
+           1px -1px 0 var(--steak-red),
+          -1px  1px 0 var(--steak-red),
+           1px  1px 0 var(--steak-red),
+           3px  3px 0 var(--steak-red),
+           4px  4px 0 var(--steak-red),
+           5px  5px 0 var(--steak-red);
+      }
+
+      .logo-subtitle {
+        display: inline-block;
+        font-size: 0.75rem;
+        color: var(--tinted-ink);
+        font-weight: 700;
+        margin-top: 1.5rem;
+        background: var(--mint);
+        padding: 0.2rem 0.5rem;
+        border: var(--border-light);
+      }
+
+      .logo-subtitle::before,
+      .logo-subtitle::after {
+        display: none;
+      }
+
+      .control-panel {
+        width: 100%;
+        align-self: stretch;
+        box-shadow: none;
+        border: 0;
+        padding: 1rem;
+        background: var(--cream-light);
+      }
+
+      .panel-header {
+        display: none;
+      }
+
+      .section-header {
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.25rem;
+      }
+
+      .input-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+      }
+
+      .sub-label {
+        font-size: 0.6rem;
+        color: var(--steak-red);
+      }
+
+      input[type="number"],
+      input[type="search"],
+      select {
+        min-height: 44px;
+        background: var(--field);
+        font-size: 0.95rem;
+      }
+
+      input[type="number"] {
+        font-size: 1.2rem;
+      }
+
+      .toggle-grid {
+        background: var(--field);
+      }
+
+      .toggle-label {
+        padding: 0.75rem 0.35rem;
+        font-size: 0.72rem;
+      }
+
+      .readout-panel {
+        display: contents;
+      }
+
+      .manifest-section {
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 0;
+        box-shadow: none;
+        background: var(--cream);
+      }
+
+      .manifest-title {
+        font-size: 1.55rem;
+      }
+
+      .manifest-card {
+        margin: 0 1rem 1rem;
+      }
+
+      .manifest-row {
+        font-size: 0.75rem;
+      }
+
+      .manifest-detail {
+        font-size: 0.62rem;
+      }
+
+      .site-footer {
+        display: block;
+        width: 100%;
+        align-self: stretch;
+        margin: 0;
+        padding: 1rem;
+        border-top: var(--border-heavy);
+        background: var(--mint-faint);
+        color: var(--black);
+        font-size: 0.6rem;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .logo-title {
+        font-size: 2.85rem;
+      }
+
+      .title-small {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-block block-mint-sunburst" aria-hidden="true">
+    <svg class="sunburst-svg" viewBox="0 0 200 100" preserveAspectRatio="none">
+      <g transform="translate(100, 100)">
+        <line x1="0" y1="0" x2="-100" y2="0"></line>
+        <line x1="0" y1="0" x2="-95" y2="-30"></line>
+        <line x1="0" y1="0" x2="-80" y2="-60"></line>
+        <line x1="0" y1="0" x2="-50" y2="-85"></line>
+        <line x1="0" y1="0" x2="-15" y2="-98"></line>
+        <line x1="0" y1="0" x2="15" y2="-98"></line>
+        <line x1="0" y1="0" x2="50" y2="-85"></line>
+        <line x1="0" y1="0" x2="80" y2="-60"></line>
+        <line x1="0" y1="0" x2="95" y2="-30"></line>
+        <line x1="0" y1="0" x2="100" y2="0"></line>
+      </g>
+    </svg>
+  </div>
+
+  <div class="bg-block block-salmon-arches" aria-hidden="true">
+    <div class="arch-pattern"></div>
+  </div>
+
+  <div class="container">
+    <header class="site-header">
+      <div class="logo-lockup">
+        <div class="logo-inner">
+          <div class="mobile-meta mobile-only">@madebydia tool 01</div>
+          <div class="title-small mobile-only">domestic</div>
+          <h1 class="logo-title">MEAT MATH</h1>
+          <div class="logo-subtitle">Protein for busy people</div>
+        </div>
+        <div class="badge-container desktop-only">
+          <div class="deco-badge">
+            <svg class="badge-text" viewBox="0 0 100 100" aria-hidden="true">
+              <path id="curve" fill="transparent" d="M 15, 50 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0"></path>
+              <text font-family="var(--font-mono)" font-size="8" font-weight="bold" letter-spacing="0" fill="var(--olive)">
+                <textPath href="#curve" startOffset="50%" text-anchor="middle">DINNER GOT SIMPLER</textPath>
+              </text>
+            </svg>
+            <svg class="badge-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <polygon points="4,12 8,4 18,6 20,16 12,20"></polygon>
+              <line x1="8" y1="4" x2="12" y2="12"></line>
+              <line x1="18" y1="6" x2="12" y2="12"></line>
+              <line x1="20" y1="16" x2="12" y2="12"></line>
+              <line x1="4" y1="12" x2="12" y2="12"></line>
+              <circle cx="12" cy="12" r="1.5" fill="var(--steak-red)"></circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="control-panel">
+      <div class="input-instruction">
+        Pick a protein target for one plate. The calculator returns the cooked amount to serve and the raw amount to plan.
+      </div>
+
+      <div class="input-group">
+        <div class="section-header">Protein target <span>(per meal)</span></div>
+        <label for="protein">Target grams</label>
+        <span class="sub-label">Start with the protein you want on one plate.</span>
+        <input id="protein" type="number" min="1" max="300" value="30" inputmode="decimal" aria-describedby="protein-error">
+        <p id="protein-error" class="error">Use a target between 1 and 300 grams.</p>
+      </div>
+
+      <div class="input-group">
+        <div class="section-header">Units <span>(display)</span></div>
+        <div class="toggle-grid unit-grid" role="group" aria-label="Weight units">
+          <button type="button" class="toggle-label active accent" data-unit="g">Grams</button>
+          <button type="button" class="toggle-label" data-unit="oz">Ounces</button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="section-header">Protein lane <span>(filter)</span></div>
+        <span class="sub-label">Narrow the list to what you are actually cooking.</span>
+        <div class="toggle-grid" role="group" aria-label="Filter by protein type">
+          <button type="button" class="toggle-label active accent" data-category="all">All</button>
+          <button type="button" class="toggle-label" data-category="beef">Beef</button>
+          <button type="button" class="toggle-label" data-category="poultry">Poultry</button>
+          <button type="button" class="toggle-label" data-category="pork">Pork</button>
+          <button type="button" class="toggle-label" data-category="lamb">Lamb</button>
+          <button type="button" class="toggle-label" data-category="fish">Fish</button>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="section-header">Find a cut <span>(optional)</span></div>
+        <label for="search">Search</label>
+        <span class="sub-label">Ribeye, salmon, beef, thigh, liver.</span>
+        <input id="search" type="search" placeholder="ribeye, salmon, beef..." autocomplete="off">
+      </div>
+
+      <div class="input-group">
+        <div class="section-header">Sort <span>(priority)</span></div>
+        <label for="sort">Show first</label>
+        <div class="select-wrap">
+          <select id="sort">
+            <option value="efficiency-desc">Most protein per calorie</option>
+            <option value="cooked-asc">Smallest cooked portion</option>
+            <option value="raw-asc">Smallest raw portion</option>
+            <option value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+          </select>
+        </div>
+      </div>
+    </main>
+
+    <aside class="readout-panel">
+      <div class="output-card highlight">
+        <div class="output-card-inner">
+          <div id="top-cooked-label" class="output-label">Most protein per calorie</div>
+          <div id="top-cooked" class="output-value alert">--</div>
+          <div id="top-cooked-sub" class="output-sub">On the plate</div>
+        </div>
+      </div>
+
+      <div class="output-card">
+        <div class="output-card-inner">
+          <div class="output-label">First match</div>
+          <div id="top-cut" class="output-value" style="font-size: 2rem;">--</div>
+          <div id="top-cut-sub" class="output-sub">Raw and cooked amounts below</div>
+        </div>
+      </div>
+
+      <section class="manifest-section">
+        <h2 class="manifest-title">Plate<br>Manifest</h2>
+        <div class="manifest-card">
+          <div class="manifest-total">
+            Protein target
+            <span id="target-readout">30g</span>
+          </div>
+          <div id="manifest-rows"></div>
+          <div id="empty" class="manifest-detail" hidden>No cuts matched. Try a broader search or switch protein lanes.</div>
+          <button id="copy" type="button" class="copy-btn">Copy meal math</button>
+          <details>
+            <summary>Where the numbers come from</summary>
+            <p>Nutrition values are approximate per 100g from <a href="https://fdc.nal.usda.gov/" target="_blank" rel="noopener">USDA FoodData Central</a> entries and vary by cut, trimming, source, and cooking method. Mercury notes follow <a href="https://www.fda.gov/food/consumers/advice-about-eating-fish" target="_blank" rel="noopener">FDA/EPA advice about eating fish</a>. Raw-to-cooked differences use separate protein-per-100g values where available.</p>
+          </details>
+        </div>
+      </section>
+    </aside>
+
+    <footer class="info-footer"><a href="https://x.com/madebydia" target="_blank" rel="noopener">@madebydia is on 𝕏</a></footer>
+    <footer class="site-footer"><a href="https://x.com/madebydia" target="_blank" rel="noopener">@madebydia is on 𝕏</a></footer>
+  </div>
+
+  <script>
+    const meats = [
+      { name: "Ground Beef (85/15)", rawProt: 18.6, cookedProt: 25.9, category: "beef", fat: 15.0, calories: 212 },
+      { name: "Sirloin Steak", rawProt: 20.3, cookedProt: 26.1, category: "beef", fat: 12.7, calories: 196 },
+      { name: "Beef Tenderloin", rawProt: 22.1, cookedProt: 27.5, category: "beef", fat: 13.5, calories: 213 },
+      { name: "Beef Liver", rawProt: 20.4, cookedProt: 29.1, category: "beef", fat: 3.6, calories: 135 },
+      { name: "Lean Beef Brisket", rawProt: 21.2, cookedProt: 29.6, category: "beef", fat: 6.5, calories: 155 },
+      { name: "Flat Iron Steak", rawProt: 20.5, cookedProt: 23.0, category: "beef", fat: 10.2, calories: 180 },
+      { name: "Ribeye Steak", rawProt: 20.2, cookedProt: 26.0, category: "beef", fat: 22.0, calories: 291 },
+      { name: "Chicken Breast", rawProt: 23.1, cookedProt: 31.0, category: "poultry", fat: 3.6, calories: 165 },
+      { name: "Chicken Thigh", rawProt: 18.6, cookedProt: 25.9, category: "poultry", fat: 9.2, calories: 177 },
+      { name: "Turkey Breast", rawProt: 22.5, cookedProt: 30.1, category: "poultry", fat: 0.7, calories: 104 },
+      { name: "Pork Chop", rawProt: 20.9, cookedProt: 27.1, category: "pork", fat: 9.2, calories: 172 },
+      { name: "Lamb Liver", rawProt: 20.4, cookedProt: 26.1, category: "lamb", fat: 7.5, calories: 157 },
+      { name: "Lamb Shoulder", rawProt: 17.8, cookedProt: 22.4, category: "lamb", fat: 16.5, calories: 233 },
+      { name: "Lamb Leg", rawProt: 19.2, cookedProt: 25.6, category: "lamb", fat: 12.7, calories: 194 },
+      { name: "Ground Lamb", rawProt: 17.5, cookedProt: 27.1, category: "lamb", fat: 17.1, calories: 234 },
+      { name: "Salmon", rawProt: 20.0, cookedProt: 22.4, category: "fish", fat: 13.4, calories: 208, mercury: "very low" },
+      { name: "Catfish", rawProt: 15.6, cookedProt: 18.2, category: "fish", fat: 7.8, calories: 132, mercury: "low" },
+      { name: "Pacific Cod", rawProt: 17.9, cookedProt: 17.0, category: "fish", fat: 0.7, calories: 82, mercury: "low" },
+      { name: "Atlantic Mackerel", rawProt: 19.3, cookedProt: 22.6, category: "fish", fat: 15.1, calories: 205, mercury: "very low" },
+      { name: "Herring", rawProt: 17.4, cookedProt: 23.1, category: "fish", fat: 9.0, calories: 158, mercury: "very low" },
+      { name: "Pollock", rawProt: 19.0, cookedProt: 20.0, category: "fish", fat: 1.0, calories: 90, mercury: "low" },
+      { name: "Haddock", rawProt: 20.0, cookedProt: 24.0, category: "fish", fat: 0.8, calories: 90, mercury: "low" },
+      { name: "Flounder/Sole", rawProt: 18.0, cookedProt: 19.5, category: "fish", fat: 1.2, calories: 85, mercury: "low" },
+      { name: "Whiting", rawProt: 18.0, cookedProt: 20.0, category: "fish", fat: 1.0, calories: 90, mercury: "low" },
+      { name: "Lake Whitefish", rawProt: 19.0, cookedProt: 21.0, category: "fish", fat: 7.2, calories: 135, mercury: "low" }
+    ].map((meat) => ({
+      ...meat,
+      efficiency: (meat.rawProt / meat.calories) * 100
+    }));
+
+    const els = {
+      protein: document.getElementById("protein"),
+      proteinError: document.getElementById("protein-error"),
+      search: document.getElementById("search"),
+      sort: document.getElementById("sort"),
+      unitButtons: document.querySelectorAll("[data-unit]"),
+      categoryButtons: document.querySelectorAll("[data-category]"),
+      rows: document.getElementById("manifest-rows"),
+      empty: document.getElementById("empty"),
+      target: document.getElementById("target-readout"),
+      topCookedLabel: document.getElementById("top-cooked-label"),
+      topCooked: document.getElementById("top-cooked"),
+      topCookedSub: document.getElementById("top-cooked-sub"),
+      topCut: document.getElementById("top-cut"),
+      topCutSub: document.getElementById("top-cut-sub"),
+      copy: document.getElementById("copy")
+    };
+
+    let unit = "g";
+    let category = "all";
+    let latestRows = [];
+
+    const searchAliases = {
+      beef: ["burger"],
+      poultry: ["bird"],
+      pork: ["pig"],
+      lamb: ["mutton"],
+      fish: ["seafood"]
+    };
+
+    function formatWeight(grams) {
+      if (unit === "oz") return `${(grams / 28.3495).toFixed(1)} oz`;
+      return `${Math.round(grams)} g`;
+    }
+
+    function categoryLabel(value) {
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function searchText(meat) {
+      return [
+        meat.name,
+        meat.category,
+        categoryLabel(meat.category),
+        ...(searchAliases[meat.category] || [])
+      ].join(" ").toLowerCase();
+    }
+
+    function render() {
+      const target = Number.parseFloat(els.protein.value);
+      const valid = Number.isFinite(target) && target >= 1 && target <= 300;
+      els.proteinError.style.display = valid ? "none" : "block";
+      if (!valid) return;
+
+      const query = els.search.value.trim().toLowerCase();
+      const sortLabels = {
+        "efficiency-desc": "Most protein per calorie",
+        "cooked-asc": "Smallest cooked portion",
+        "raw-asc": "Smallest raw portion",
+        "name-asc": "Name A-Z",
+        "name-desc": "Name Z-A"
+      };
+      let rows = meats
+        .filter((meat) => category === "all" || meat.category === category)
+        .filter((meat) => !query || searchText(meat).includes(query))
+        .map((meat) => {
+          const rawG = (target / meat.rawProt) * 100;
+          const cookedG = (target / meat.cookedProt) * 100;
+          const portionCalories = Math.round((rawG / 100) * meat.calories);
+          const portionFat = ((rawG / 100) * meat.fat).toFixed(1);
+          return { ...meat, rawG, cookedG, portionCalories, portionFat };
+        });
+
+      switch (els.sort.value) {
+        case "raw-asc":
+          rows.sort((a, b) => a.rawG - b.rawG);
+          break;
+        case "efficiency-desc":
+          rows.sort((a, b) => b.efficiency - a.efficiency);
+          break;
+        case "name-asc":
+          rows.sort((a, b) => a.name.localeCompare(b.name));
+          break;
+        case "name-desc":
+          rows.sort((a, b) => b.name.localeCompare(a.name));
+          break;
+        case "cooked-asc":
+        default:
+          rows.sort((a, b) => a.cookedG - b.cookedG);
+      }
+
+      latestRows = rows;
+      els.rows.innerHTML = "";
+      els.target.textContent = `${target}g`;
+      els.topCookedLabel.textContent = sortLabels[els.sort.value] || "First cooked portion";
+      els.empty.hidden = rows.length !== 0;
+
+      const first = rows[0];
+      if (first) {
+        els.topCooked.textContent = formatWeight(first.cookedG);
+        els.topCookedSub.textContent = `${first.name} on the plate`;
+        els.topCut.textContent = first.name;
+        els.topCutSub.textContent = `${formatWeight(first.rawG)} raw before cooking`;
+      } else {
+        els.topCooked.textContent = "--";
+        els.topCookedSub.textContent = "No matching cut";
+        els.topCut.textContent = "--";
+        els.topCutSub.textContent = "Try another search";
+      }
+
+      rows.forEach((row) => {
+        const item = document.createElement("div");
+        item.className = "manifest-row";
+        const mercury = row.mercury ? `; mercury ${row.mercury}` : "";
+        item.innerHTML = `
+          <div class="manifest-item">${row.name}</div>
+          <div class="manifest-leader"></div>
+          <div class="manifest-weight">${formatWeight(row.cookedG)}</div>
+          <div class="manifest-detail">${categoryLabel(row.category)}; ${formatWeight(row.rawG)} raw; ${row.portionCalories} kcal; ${row.portionFat}g fat; ${row.efficiency.toFixed(1)}g protein / 100 kcal${mercury}</div>
+        `;
+        els.rows.appendChild(item);
+      });
+    }
+
+    function setActive(buttons, activeButton) {
+      buttons.forEach((button) => button.classList.remove("active", "accent"));
+      activeButton.classList.add("active", "accent");
+    }
+
+    function copyResults() {
+      const target = Number.parseFloat(els.protein.value);
+      const lines = [`Meat math for ${target}g protein`, `Units: ${unit}`, ""];
+      latestRows.forEach((row) => {
+        lines.push(`${row.name}: ${formatWeight(row.cookedG)} cooked (${formatWeight(row.rawG)} raw)`);
+      });
+
+      navigator.clipboard.writeText(lines.join("\n")).then(() => {
+        els.copy.textContent = "Copied";
+        window.setTimeout(() => { els.copy.textContent = "Copy meal math"; }, 1400);
+      }).catch(() => {
+        els.copy.textContent = "Copy failed";
+        window.setTimeout(() => { els.copy.textContent = "Copy meal math"; }, 1400);
+      });
+    }
+
+    els.protein.addEventListener("input", render);
+    els.search.addEventListener("input", () => {
+      if (els.search.value.trim() && category !== "all") {
+        category = "all";
+        setActive(els.categoryButtons, document.querySelector("[data-category='all']"));
+      }
+      render();
+    });
+    els.sort.addEventListener("change", render);
+    els.copy.addEventListener("click", copyResults);
+
+    els.unitButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        unit = button.dataset.unit;
+        setActive(els.unitButtons, button);
+        render();
+      });
+    });
+
+    els.categoryButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        category = button.dataset.category;
+        setActive(els.categoryButtons, button);
+        render();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
