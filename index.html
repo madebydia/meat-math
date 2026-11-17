@@ -1185,7 +1185,11 @@
       const target = Number.parseFloat(els.protein.value);
       const valid = Number.isFinite(target) && target >= 1 && target <= 300;
       els.proteinError.style.display = valid ? "none" : "block";
-      if (!valid) return;
+      if (!valid) {
+        els.rows.innerHTML = "";
+        els.empty.hidden = false;
+        return;
+      }
 
       const query = els.search.value.trim().toLowerCase();
       const sortLabels = {
